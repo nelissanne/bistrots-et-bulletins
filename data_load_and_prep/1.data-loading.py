@@ -2,21 +2,17 @@ import duckdb
 import pandas as pd
 import requests
 
-BASE = "https://www.data.gouv.fr/api/1"
-
-
-
 
 # Récupération des données des élections municipales 2026
-url_t1 = "https://tabular-api.data.gouv.fr/api/resources/4feeef01-24f7-4d5a-914f-8aa806f31ec2/data/csv/"
-t1_muni_26 = pd.read_csv(url_csv, sep=",")
+url_t1 = "https://www.data.gouv.fr/api/1/datasets/r/4feeef01-24f7-4d5a-914f-8aa806f31ec2"
+t1_muni_26 = pd.read_csv(url_t1, sep=";")
 
-url_t2 = "https://tabular-api.data.gouv.fr/api/resources/6ff67a28-01bf-459e-beca-dd7aa8132dc1/data/csv/"
-t2_muni_26 = pd.read_csv(url_csv, sep=",")
+url_t2 = "https://www.data.gouv.fr/api/1/datasets/r/6ff67a28-01bf-459e-beca-dd7aa8132dc1"
+t2_muni_26 = pd.read_csv(url_t2, sep=";")
 
 # Récupération des données des bistrots (NAF 56.30Z) dans le répertoire Sirene
 
-url_sirene = "https://static.data.gouv.fr/resources/base-sirene-des-entreprises-et-de-leurs-etablissements-siren-siret/20261001-073823/stock-stocketablissement-parquet.parquet"
+url_sirene = "https://www.data.gouv.fr/api/1/datasets/r/a29c1297-1f92-4e2a-8f6b-8c902ce96c5f"
 tous_bistrots_sirene = duckdb.sql(f"""
     SELECT *
     FROM read_parquet('{url_sirene}')
@@ -24,7 +20,7 @@ tous_bistrots_sirene = duckdb.sql(f"""
 """).df()
 
 # Récupération des dates de fermeture des bistrots fermés depuis les municipales
-url_sirene_historique = "https://static.data.gouv.fr/resources/base-sirene-des-entreprises-et-de-leurs-etablissements-siren-siret/20261001-074108/stock-stocketablissementhistorique-parquet.parquet"
+url_sirene_historique = "https://www.data.gouv.fr/api/1/datasets/r/2b3a0c79-f97b-46b8-ac02-8be6c1f01a8c"
 bistrots_sirene_fermetures = duckdb.sql(f"""
     SELECT siret, dateDebut AS date_fermeture
     FROM read_parquet('{url_sirene_historique}')
