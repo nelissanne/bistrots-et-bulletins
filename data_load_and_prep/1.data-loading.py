@@ -5,40 +5,43 @@ import requests
 BASE = "https://www.data.gouv.fr/api/1"
 
 
-# Fonction de récupération des URL par nom de fichier
-def get_url(ds, title_part, fmt="parquet"):
-    res = next(r for r in ds["resources"]
-               if title_part in r["title"] and r["format"].lower() == fmt)
-    return res["url"]
 
 
 # Récupération des données des élections municipales 2026
-ds_elections = requests.get(f"{BASE}/datasets/donnees-des-elections-agregees/").json()
-url_candidats = get_url(ds_elections, "Résultats par candidat")
+url_t1 = "https://tabular-api.data.gouv.fr/api/resources/4feeef01-24f7-4d5a-914f-8aa806f31ec2/data/csv/"
+t1_muni_26 = pd.read_csv(url_csv, sep=",")
 
-t1_muni_26 = duckdb.sql(f"""
-    SELECT *
-    FROM read_parquet('{url_candidats}')
-    WHERE id_election == '2026_muni_t1'
-""").df()
-
-t2_muni_26 = duckdb.sql(f"""
-    SELECT *
-    FROM read_parquet('{url_candidats}')
-    WHERE id_election == '2026_muni_t2'
-""").df()
+url_t2 = "https://tabular-api.data.gouv.fr/api/resources/6ff67a28-01bf-459e-beca-dd7aa8132dc1/data/csv/"
+t2_muni_26 = pd.read_csv(url_csv, sep=",")
 
 # Récupération des données des bistrots (NAF 56.30Z) dans le répertoire Sirene
 
-ds_sirene = requests.get(f"{BASE}/datasets/base-sirene-des-entreprises-et-de-leurs-etablissements-siren-siret/").json()
-url_etab = get_url(ds_sirene, "StockEtablissement")
-
-bistrots_sirene = duckdb.sql(f"""
+url_sirene = "https://static.data.gouv.fr/resources/base-sirene-des-entreprises-et-de-leurs-etablissements-siren-siret/20261001-073823/stock-stocketablissement-parquet.parquet"
+tous_bistrots_sirene = duckdb.sql(f"""
     SELECT *
-    FROM read_parquet('{url_etab}')
+    FROM read_parquet('{url_sirene}')
     WHERE activitePrincipaleEtablissement == '56.30Z'
 """).df()
 
+# Récupération des dates de fermeture des bistrots fermés depuis les municipales
+url_sirene_historique = "https://static.data.gouv.fr/resources/base-sirene-des-entreprises-et-de-leurs-etablissements-siren-siret/20261001-074108/stock-stocketablissementhistorique-parquet.parquet"
+bistrots_sirene_fermetures = duckdb.sql(f"""
+    SELECT siret, dateDebut AS date_fermeture
+    FROM read_parquet('{url_sirene_historique}')
+    WHERE etatAdministratifEtablissement = 'F'
+      AND changementEtatAdministratifEtablissement = 'true'
+""").df()
+
+# Merge des bistrots avec leur éventuelle date de fermeture
+bistrots_sirene_actifs = tous_bistrots_sirene.merge(
+  bistrots_sirene_fermetures,
+  left_on = ["siret"],
+  right_on = ["siret"],
+  how = "left"
+)
+
+# Filtre des bistrots pour qu'ils soient ouverts pendant les municipales
+bistrots_sirene = bistrots_sirene_actifs[((bistrots_sirene_actifs.date_fermeture >= "2026-01-04") | (bistrots_sirene_actifs.date_fermeture.isnull())) & (bistrots_sirene_actifs.dateCreationEtablissement <= "2026-03-01")]
 
 # Récupération des données Filosofi au niveau commune - pas utile immédiatement mais à intégrer plus tard à l'analyse ?
 
