@@ -4,7 +4,7 @@ Projet Python de deuxième année de l'Ensae. L'objectif est de confronter au ni
 ## Pour reproduire ces résultats 
 
 * Le kernel doit tourner sur Python 3.13.15
-
+* Le repo doit être cloné sur le datalab Onyxia pour accéder à Minio. En effet, le nombre de requête étant fortement limité sur le site mettant a disposition les sources, ces dernières ont été copiées sur un bucket Onyxia par souci d'efficacité. 
 
 
 ### Sources & données
