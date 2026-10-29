@@ -1,4 +1,4 @@
-# Fonction pour classer les nuances en couleur 
+# Fonction pour classer les nuances en couleur ------------------------------------------
 def classer_nuance(df_nuance):
     # Créer la nouvelle variable
     df_nuance["Couleur"] = ""
@@ -29,6 +29,7 @@ def classer_nuance(df_nuance):
     return df_nuance
 
 
+# Fonction pour créer un indicateur d'extrême droite --------------------------
 def classer_nuance_extd(df_nuance):
     nuances_extd = ['LRN', 'LUXD', 'LEXD', 'LUDR']
 
