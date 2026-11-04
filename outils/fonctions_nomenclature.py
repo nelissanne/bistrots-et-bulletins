@@ -16,8 +16,10 @@ def classer_nuance(df_nuance):
     df_nuance.loc[df_nuance["Nuance"].isin(["LHOR", "LUDI"]), "Couleur"] = "Centre"
     df_nuance.loc[df_nuance["Nuance"].isin(["LSOC", "LFI", "LCOM"]), "Couleur"] = "Gauche"
     
+    # Sans étiquette (associée aux NaN dans la table)
+    df_nuance.loc[df_nuance["Nuance"].isna(), "Couleur"] = "Sans étiquette"
 
-    # Contrôle : nuances sans couleur
+    # Contrôle : nuances sans couleur (contrôle codé par LLM)
     sans_couleur = df_nuance.loc[df_nuance["Couleur"].eq(""), "Nuance"].unique()
 
     if len(sans_couleur) > 0:
@@ -39,6 +41,7 @@ def classer_nuance_extd(df_nuance):
 
     sans_ind3 = df_nuance.loc[df_nuance["ind3"].eq(""), "Nuance_maj"].unique()
 
+    # contrôle codé par LLM
     if len(sans_ind3) > 0:
         raise ValueError(
             f"STOP : il y a {len(sans_ind3)} nuances sans indicateur : "
