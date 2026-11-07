@@ -21,3 +21,27 @@ def synthese_table_muni(muni):
     )
 
     return muni_long
+
+# Fonction pour créer l'indicateur 1 
+def crea_ind1(df, nomenclature_couleur_nuance):
+
+    # Sélection de la liste ayant obtenu le plus de sièges au CM
+    df_ind1 = (
+        df.loc[
+            df.groupby('Code commune')['Sièges au CM'].idxmax(),
+            ['Code commune', 'Libellé commune', 'Nuance']]
+        .drop_duplicates()
+        .reset_index(drop=True)
+    )
+
+    # Merge avec la nomenclature des couleurs politiques
+    df_ind1 = (df_ind1.merge(nomenclature_couleur_nuance)
+        .rename(columns={'Nuance': 'Nuance_maj'}))
+
+    # Création de l'indicateur 1
+    df_ind1['ind1'] = 0
+
+    df_ind1.loc[df_ind1['Couleur'] == 'Droite', 'ind1'] = 1
+    df_ind1.loc[df_ind1['Couleur'] == 'Sans étiquette', 'ind1'] = 2
+
+    return df_ind1
