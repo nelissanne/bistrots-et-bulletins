@@ -38,8 +38,9 @@ def classer_nuance_extd(df_nuance):
     df_nuance["ind3"] = (
         df_nuance["Nuance_maj"].isin(nuances_extd).astype(int)
     )
+    df_nuance.loc[df_nuance["Couleur"] == "Sans étiquette", "ind3"] = 2
 
-    sans_ind3 = df_nuance.loc[df_nuance["ind3"].eq(""), "Nuance_maj"].unique()
+    sans_ind3 = df_nuance.loc[df_nuance["ind3"].isna(), "Nuance_maj"].unique()
 
     # contrôle codé par LLM
     if len(sans_ind3) > 0:
