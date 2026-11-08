@@ -8,7 +8,7 @@ def synthese_table_muni(muni):
     La fonction renvoie une table avec les colonnes générales de description du vote, 
     et les colonnes Nuance, et nb de siège aux conseils municipaux, pour toutes les listes candidates au sein de la commune,
     en format long et non large. 
-    
+
     """
     col_com = muni.columns[~muni.columns.str.contains(r"\d")].tolist()
     col_vote = muni.columns[muni.columns.str.contains(r"Nuance|CM", case=False)].tolist()
@@ -30,9 +30,10 @@ def synthese_table_muni(muni):
 
     return muni_long
 
+
 # Fonction pour créer l'indicateur 1 
 def crea_ind1(df, nomenclature):
- """
+    """
     Fonction permettant de créer un indicateur de nuance majoritaire au conseil municipal : 
     - prend 1 si la nuance majoritaire est de droite
     - prend 2 si la nuance majoritaire est sans étiquette
@@ -47,14 +48,15 @@ def crea_ind1(df, nomenclature):
     df_ind1 = (
         df.loc[
             df.groupby('Code commune')['Sièges au CM'].idxmax(),
-            ['Code commune', 'Libellé commune', 'Nuance']]
+            ['Code commune', 'Libellé commune', 'Nuance']
+        ]
         .drop_duplicates()
         .reset_index(drop=True)
     )
 
     # Merge avec la nomenclature des couleurs politiques
     df_ind1 = (df_ind1.merge(nomenclature)
-        .rename(columns={'Nuance': 'Nuance_maj'}))
+            .rename(columns={'Nuance': 'Nuance_maj'}))
 
     # Création de l'indicateur 1
     df_ind1['ind1'] = 0
@@ -64,9 +66,10 @@ def crea_ind1(df, nomenclature):
 
     return df_ind1
 
+
 # Fonction pour créer l'indicateur 2 
 def crea_ind2(df, nomenclature):
-  """
+    """
     Fonction permettant de créer un indicateur de couleur majoritaire au conseil municipal : 
     - prend 1 si la couleur majoritaire est de droite
     - prend 2 si la couleur majoritaire est sans étiquette
@@ -76,11 +79,13 @@ def crea_ind2(df, nomenclature):
     et la nomenclature de classement des nuances en couleur 
     La fonction renvoie en sortie une table avec l'indicateur 2
     """
+
     # Ajout nomenclature
     df = df.merge(nomenclature)
 
     # Sommer le nombre de sièges par commune et couleur et conserver la couleur majoritaire
-    df_ind = (df.drop(columns='Nuance')
+    df_ind = (
+        df.drop(columns='Nuance')
         .groupby(['Code commune', 'Couleur'], as_index=False)
         .agg({'Sièges au CM': 'sum'})
     )
@@ -95,6 +100,7 @@ def crea_ind2(df, nomenclature):
     df_ind.loc[df_ind['Couleur'] == 'Sans étiquette', 'ind2'] = 2
 
     return df_ind
+
 
 def crea_ind3(df_nuance):
     """
