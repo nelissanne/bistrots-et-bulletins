@@ -29,23 +29,3 @@ def classer_nuance(df_nuance):
         )
 
     return df_nuance
-
-
-# Fonction pour créer un indicateur d'extrême droite --------------------------
-def classer_nuance_extd(df_nuance):
-    nuances_extd = ['LRN', 'LUXD', 'LEXD', 'LUDR']
-
-    df_nuance["ind3"] = (
-        df_nuance["Nuance_maj"].isin(nuances_extd).astype(int)
-    )
-    df_nuance.loc[df_nuance["Couleur"] == "Sans étiquette", "ind3"] = 2
-
-    sans_ind3 = df_nuance.loc[df_nuance["ind3"].isna(), "Nuance_maj"].unique()
-
-    # contrôle codé par LLM
-    if len(sans_ind3) > 0:
-        raise ValueError(
-            f"STOP : il y a {len(sans_ind3)} nuances sans indicateur : "
-            f"{list(sans_ind3)}. Impossible de renvoyer la table."
-        )
-    return df_nuance
