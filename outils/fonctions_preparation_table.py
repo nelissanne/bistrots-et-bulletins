@@ -48,7 +48,7 @@ def crea_ind1(df, nomenclature):
     df_ind1 = (
         df.loc[
             df.groupby('Code commune')['Sièges au CM'].idxmax(),
-            ['Code commune', 'Libellé commune', 'Nuance']
+            ['Code commune', 'Libellé commune', 'Nombre candidats', 'Nuance']
         ]
         .drop_duplicates()
         .reset_index(drop=True)
@@ -84,11 +84,10 @@ def crea_ind2(df, nomenclature):
     df = df.merge(nomenclature)
 
     # Sommer le nombre de sièges par commune et couleur et conserver la couleur majoritaire
-    df_ind = (
-        df.drop(columns='Nuance')
-        .groupby(['Code commune', 'Couleur'], as_index=False)
-        .agg({'Sièges au CM': 'sum'})
-    )
+    df_ind = (df.drop(columns='Nuance')
+            .groupby(['Code commune', 'Couleur'], as_index=False)
+            .agg({'Sièges au CM': 'sum'})
+        )
 
     df_ind = df_ind.loc[
         df_ind.groupby('Code commune')['Sièges au CM'].idxmax()
