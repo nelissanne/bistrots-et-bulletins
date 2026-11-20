@@ -1,6 +1,7 @@
 import pandas 
 
 def synthese_table_muni(muni):
+
     """
     Fonction qui transforme les tables sources brutes en tables synthétiques (ie, avec les colonnes nécessaires à l'analyse)
 
@@ -11,13 +12,13 @@ def synthese_table_muni(muni):
 
     """
     col_com = muni.columns[~muni.columns.str.contains(r"\d")].tolist()
-    col_vote = muni.columns[muni.columns.str.contains(r"Nuance|CM", case=False)].tolist()
+    col_vote = muni.columns[muni.columns.str.contains(r"Nuance|CM|% Voix/inscrits", case=False)].tolist()
     muni = muni[col_com + col_vote]
 
     muni_long = (
         pandas.wide_to_long(
             muni,
-            stubnames=["Nuance liste", "Sièges au CM"],
+            stubnames=["Nuance liste", "Sièges au CM", "% Voix/inscrits"],
             i="Code commune",
             j="numero_liste",
             sep=" ",
@@ -31,7 +32,6 @@ def synthese_table_muni(muni):
     return muni_long
 
 
-# Fonction pour créer l'indicateur 1 
 def crea_ind1(df, nomenclature):
     """
     Fonction permettant de créer un indicateur de nuance majoritaire au conseil municipal : 
@@ -39,7 +39,7 @@ def crea_ind1(df, nomenclature):
     - prend 2 si la nuance majoritaire est sans étiquette
     - prend 0 sinon (gauche ou centre)
 
-    La fonction prend en entrée la table renvoyée par la fonctionc synthese_table_muni, 
+    La fonction prend en entrée la table renvoyée par la fonction synthese_table_muni, 
     et la nomenclature de classement des nuances en couleur 
     La fonction renvoie en sortie une table avec l'indicateur 1
     """
@@ -67,7 +67,6 @@ def crea_ind1(df, nomenclature):
     return df_ind1
 
 
-# Fonction pour créer l'indicateur 2 
 def crea_ind2(df, nomenclature):
     """
     Fonction permettant de créer un indicateur de couleur majoritaire au conseil municipal : 
@@ -75,7 +74,7 @@ def crea_ind2(df, nomenclature):
     - prend 2 si la couleur majoritaire est sans étiquette
     - prend 0 sinon (gauche ou centre)
 
-    La fonction prend en entrée la table renvoyée par la fonctionc synthese_table_muni, 
+    La fonction prend en entrée la table renvoyée par la fonction synthese_table_muni, 
     et la nomenclature de classement des nuances en couleur 
     La fonction renvoie en sortie une table avec l'indicateur 2
     """
@@ -108,7 +107,7 @@ def crea_ind3(df_nuance):
     - prend 2 si la nuance est sans étiquette
     - prend 0 sinon (gauche ou centre)
 
-    La fonction prend en entrée la table renvoyée par la fonctionc crea_ind1, de laquelle on drop la colonne ind1
+    La fonction prend en entrée la table renvoyée par la fonction crea_ind1, de laquelle on drop la colonne ind1
     La fonction renvoie en sortie une table avec l'indicateur 3
     """
     nuances_extd = ['LRN', 'LUXD', 'LEXD', 'LUDR']
@@ -119,3 +118,45 @@ def crea_ind3(df_nuance):
     df_nuance.loc[df_nuance["Couleur"] == "Sans étiquette", "ind3"] = 2
 
     return df_nuance
+
+
+def crea_ind4(df_nuance):
+    """
+    Fonction permettant de créer un indicateur Horizon : 
+    - prend 1 si la nuance est de la liste Horizon
+    - prend 2 si la nuance est sans étiquette
+    - prend 0 sinon
+
+    La fonction prend en entrée la table renvoyée par la fonction crea_ind1, de laquelle on drop la colonne ind1
+    La fonction renvoie en sortie une table avec l'indicateur 4
+    """
+    nuance_Hor = ['LHOR']
+
+    df_nuance["ind4"] = (
+        df_nuance["Nuance_maj"].isin(nuance_Hor).astype(int)
+    )
+    df_nuance.loc[df_nuance["Couleur"] == "Sans étiquette", "ind4"] = 2
+
+    return df_nuance
+
+def calcul_part_voteHorizon(df):
+    """
+    Fonction permettant de calculer la part de voix/exprimés pour la liste Horizon. S'il n'y a pas de liste Horizon, la valeur affectée est -1. 
+
+    La fonction prend en entrée la table renvoyée par la fonction synthese_table_muni
+    La fonction renvoie en sortie une table avec la colonne de la part de voix/exprimés pour la liste Horizon
+
+    """
+
+    # Sélection des nuances horizon
+    df_part = df[df['Nuance']=='LHOR']
+    df_part['Part vote HorizAttal'] = df_part["% Voix/inscrits"]
+    df_part = df_part.select('Code commune','Part vote HorizAttal')
+
+    df_absents = df[~df['Code commune'].isin(df_part['Code commune'])]
+    df_absents = df_absents[['Code commune']].drop_duplicates()
+    df_absents['Part vote HorizAttal'] = -1 #arbitraire, pour repérer 
+
+    df_part = pandas.concat([df_part, df_absents], ignore_index=True)
+
+    return df_part
