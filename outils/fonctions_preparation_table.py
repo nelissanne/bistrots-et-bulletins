@@ -1,4 +1,4 @@
-import pandas 
+import pandas as pd
 
 def synthese_table_muni(muni):
 
@@ -16,7 +16,7 @@ def synthese_table_muni(muni):
     muni = muni[col_com + col_vote]
 
     muni_long = (
-        pandas.wide_to_long(
+        pd.wide_to_long(
             muni,
             stubnames=["Nuance liste", "Sièges au CM", "% Voix/inscrits",  "% Voix/exprimés"],
             i="Code commune",
@@ -139,24 +139,29 @@ def crea_ind4(df_nuance):
 
     return df_nuance
 
-def calcul_part_voteHorizon(df):
+
+def calcul_part_vote_liste_gagnante(df):
     """
-    Fonction permettant de calculer la part de voix/exprimés pour la liste Horizon. S'il n'y a pas de liste Horizon, la valeur affectée est -1. 
-
-    La fonction prend en entrée la table renvoyée par la fonction synthese_table_muni
-    La fonction renvoie en sortie une table avec la colonne de la part de voix/exprimés pour la liste Horizon
-
+    Calcule la part de voix/exprimés de la liste gagnante.
+    Entrée : la table renvoyée par la fonction synthese_table_muni.
+    Sortie : une table indexée sur le code commune, avec une ligne par commune
+    (la liste gagnante) et la colonne part_votes_liste_gagnante.
     """
+    # Création de la variable % votes liste gagnante
+    df_part = df.copy()
 
-    # Sélection des nuances horizon
-    df_part = df[df['Nuance']=='LHOR']
-    df_part['Part vote HorizAttal'] = df_part["% Voix/inscrits"]
-    df_part = df_part.select('Code commune','Part vote HorizAttal')
+    df_part["part_votes_liste_gagnante"] = (
+        pd.to_numeric(
+            df_part["% Voix/exprimés"].astype(str)
+                .str.replace("%", "", regex=False)
+                .str.replace(",", ".", regex=False)
+                .str.strip(),
+        ) / 100
+    )
 
-    df_absents = df[~df['Code commune'].isin(df_part['Code commune'])]
-    df_absents = df_absents[['Code commune']].drop_duplicates()
-    df_absents['Part vote HorizAttal'] = -1 #arbitraire, pour repérer 
-
-    df_part = pandas.concat([df_part, df_absents], ignore_index=True)
+    df_part = (
+        df_part.sort_values("part_votes_liste_gagnante", ascending=False)
+               .drop_duplicates(subset="Code commune")
+    )
 
     return df_part
