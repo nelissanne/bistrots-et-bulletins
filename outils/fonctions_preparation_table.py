@@ -12,13 +12,13 @@ def synthese_table_muni(muni):
 
     """
     col_com = muni.columns[~muni.columns.str.contains(r"\d")].tolist()
-    col_vote = muni.columns[muni.columns.str.contains(r"Nuance|CM|% Voix/inscrits", case=False)].tolist()
+    col_vote = muni.columns[muni.columns.str.contains(r"Nuance|CM|% Voix/inscrits|% Voix/exprimés", case=False)].tolist()
     muni = muni[col_com + col_vote]
 
     muni_long = (
         pandas.wide_to_long(
             muni,
-            stubnames=["Nuance liste", "Sièges au CM", "% Voix/inscrits"],
+            stubnames=["Nuance liste", "Sièges au CM", "% Voix/inscrits",  "% Voix/exprimés"],
             i="Code commune",
             j="numero_liste",
             sep=" ",
