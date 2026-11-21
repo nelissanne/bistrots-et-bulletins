@@ -1,0 +1,136 @@
+---
+title: "Les bistrots visités"
+format: html
+engine: jupyter
+---
+
+```{python}
+#| echo: false
+import json
+import pandas as pd
+from cartiflette import carti_download # tes fonctions
+
+communes = carti_download(
+    values=["France"], crs=4326, borders="COMMUNE_ARRONDISSEMENT",
+    vectorfile_format="parquet", simplification=50,
+    filter_by="FRANCE_ENTIERE_DROM_RAPPROCHES",
+    source="EXPRESS-COG-CARTO-TERRITOIRE", year=2025,
+)
+departements = carti_download(
+    values=["France"], crs=4326, borders="DEPARTEMENT",
+    vectorfile_format="parquet", simplification=50,
+    filter_by="FRANCE_ENTIERE_DROM_RAPPROCHES",
+    source="EXPRESS-COG-CARTO-TERRITOIRE", year=2025,
+)
+
+# ... lecture des données, calcul de `bistrots` ...
+```
+
+```{python}
+#| echo: false
+import json
+import numpy as np
+import pandas as pd
+import os
+import s3fs
+import sys
+import cartiflette #Attention, cartiflette n'est pas disponible par défaut sur Onyxia
+sys.path.append('../outils')
+
+import fonctions_nomenclature as fnom
+import fonctions_preparation_table as fprep
+%load_ext autoreload
+%autoreload 2
+
+np.random.seed(123)
+
+# Create filesystem object
+S3_ENDPOINT_URL = "https://" + os.environ["AWS_S3_ENDPOINT"]
+fs = s3fs.S3FileSystem(client_kwargs={'endpoint_url': S3_ENDPOINT_URL})
+BUCKET = "mathildedonnenfeld/diffusion/bistrots_et_bulletins"
+
+
+FILE_KEY_S3 = "table_analyse_muni.csv"
+FILE_PATH_S3 = BUCKET + "/" + FILE_KEY_S3
+
+with fs.open(FILE_PATH_S3, mode="rb") as file_in:
+    df = pd.read_csv(file_in, sep=",")
+
+
+import itertools
+import pandas as pd
+
+def calcul_codes(croissant=True):          # On POC avec un seul paramètre
+
+    nb_bistrots_par_ville = 1
+    nb_bistrots_total = 1000
+    nombre_villes = nb_bistrots_total/nb_bistrots_par_ville
+
+    # On crée la sous-table qui contient ces villes 
+    bistrots_visites = df.sort_values("nb_etablissements", ascending=croissant).head(int(nombre_villes)) #Arrondi à l'inférieur
+
+    # On calcule la proportion du nombre de bistrots visités dans la ville par rapport au nombre de bistrots totaux de la ville
+    bistrots_visites['part_des_etablissements_visites'] = nb_bistrots_par_ville/bistrots_visites['nb_etablissements']
+
+    # On applique cette proportion aux abstentionnistes de la ville
+    bistrots_visites['voix_pour_attal'] = bistrots_visites['part_des_etablissements_visites']*bistrots_visites['Abstentions']
+
+    # On calcule le nombre de voix obtenues par la liste gagnante
+    bistrots_visites['voix_LG'] = bistrots_visites['part_votes_liste_gagnante']*bistrots_visites['Exprimés']
+
+    # Indicatrice de victoire 
+    bistrots_visites['victoire_attal'] =  bistrots_visites['voix_pour_attal'] > bistrots_visites['voix_LG']
+
+    codes_communes_gagnees = bistrots_visites[bistrots_visites['victoire_attal']==True].CODGEO
+
+    decompte_communes = (bistrots_visites['victoire_attal'] == True).sum()
+    part_communes = decompte_communes / bistrots_visites.shape[0]   
+
+    return    codes_communes_gagnees     
+
+```
+
+
+
+
+```{python}
+#| echo: false
+
+grille = {"croissant": [True, False]}   # les valeurs proposées sur la page
+
+resultats = []
+for valeurs in itertools.product(*grille.values()):
+    params = dict(zip(grille, valeurs))
+    codes = calcul_codes(**params)
+    resultats.append(pd.DataFrame({"code": codes, **params}))
+
+res = pd.concat(resultats, ignore_index=True)
+print(res)
+
+# Ajout des coordonnées des centroïdes pour la carte
+centres = communes.to_crs(2154).centroid.to_crs(4326)
+communes["x"], communes["y"] = centres.x, centres.y
+
+points = res.merge(communes[["INSEE_COG", "NOM", "x", "y"]],
+                        left_on="code", right_on="INSEE_COG")
+points = points[["code", "NOM", "x", "y"]]
+
+ojs_define(points=points, dep=json.loads(departements.to_json()))
+```
+
+```{ojs}
+viewof n = Inputs.range([10, 1000], {step: 10, value: 100, label: "Nombre de communes"})
+
+selection = transpose(points)
+  .sort((a, b) => b.nb_etablissements - a.nb_etablissements)
+  .slice(0, n)
+
+Plot.plot({
+  projection: {type: "conic-conformal", domain: dep},
+  marks: [
+    Plot.geo(dep, {fill: "#eee", stroke: "white"}),
+    Plot.dot(selection, {x: "x", y: "y", r: 3, fill: "#c0392b",
+                         title: d => `${d.NOM} : ${d.nb_etablissements}`, tip: true})
+  ]
+})
+```
