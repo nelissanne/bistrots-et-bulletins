@@ -111,6 +111,66 @@ grid-auto-rows: minmax(0, 1fr);">
     <input id="croissant" class="form-check-input" type="checkbox" role="switch" checked="checked"> <label class="form-check-label" for="croissant"><span>Ordre croissant</span></label>
   </div>
 </div><script type="application/json" data-html-dependency="">{"name": "bslib-components", "version": "0.12.0.9000", "source": {"package": "shiny", "subdir": "www/shared/bslib/components"}, "script": [{"src": "components.min.js"}, {"src": "web-components.min.js", "type": "module"}], "stylesheet": [{"href": "components.css", "rel": "stylesheet"}], "meta": [], "all_files": false, "head": null}</script>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<p>...</p>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<div class="form-group shiny-input-container no-baseline">
+  <label class="control-label" id="nb_bistrots_par_ville-label" for="nb_bistrots_par_ville">Nombre de bistrots par ville</label><input class="js-range-slider" id="nb_bistrots_par_ville" data-skin="shiny" data-min="1" data-max="10" data-from="1" data-step="1" data-grid="false" data-grid-snap="false" data-prettify-separator="," data-prettify-enabled="true" data-keyboard="true" data-data-type="number">
+</div><script type="application/json" data-html-dependency="">{"name": "ionrangeslider", "version": "2.3.1", "source": {"package": "shiny", "subdir": "www/shared/ionrangeslider/"}, "script": [{"src": "js/ion.rangeSlider.min.js"}], "stylesheet": [{"href": "css/ion.rangeSlider.css", "rel": "stylesheet"}], "meta": [], "all_files": false, "head": null}</script>
+<script type="application/json" data-html-dependency="">{"name": "strftime", "version": "0.9.2", "source": {"package": "shiny", "subdir": "www/shared/strftime/"}, "script": [{"src": "strftime-min.js"}], "stylesheet": [], "meta": [], "all_files": false, "head": null}</script>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<div class="form-group shiny-input-container no-baseline">
+  <label class="control-label" id="nb_bistrots_total-label" for="nb_bistrots_total">Nombre total de bistrots</label><input class="js-range-slider" id="nb_bistrots_total" data-skin="shiny" data-min="100" data-max="10000" data-from="1000" data-step="100" data-grid="false" data-grid-snap="false" data-prettify-separator="," data-prettify-enabled="true" data-keyboard="true" data-data-type="number">
+</div><script type="application/json" data-html-dependency="">{"name": "ionrangeslider", "version": "2.3.1", "source": {"package": "shiny", "subdir": "www/shared/ionrangeslider/"}, "script": [{"src": "js/ion.rangeSlider.min.js"}], "stylesheet": [{"href": "css/ion.rangeSlider.css", "rel": "stylesheet"}], "meta": [], "all_files": false, "head": null}</script>
+<script type="application/json" data-html-dependency="">{"name": "strftime", "version": "0.9.2", "source": {"package": "shiny", "subdir": "www/shared/strftime/"}, "script": [{"src": "strftime-min.js"}], "stylesheet": [], "meta": [], "all_files": false, "head": null}</script>
+</div>
+<div class="cell-output cell-output-display no-overflow-x" data-execution_count="2">
+<div class="form-group shiny-input-container">
+  <label class="control-label" id="critere_tri-label" for="critere_tri">Critère de tri</label>
+  <div>
+    <select class="shiny-input-select form-select" id="critere_tri">      <option value="nb_etablissements" selected="">Nombre de bistrots</option>
+      <option value="Abstentions">Abstentions</option>
+      <option value="POPULATION">Population</option>
+      <option value="TAUX_PAUVRETE">Taux de pauvreté</option>
+      <option value="Nombre candidats">Nombre de candidats</option>
+      <option value="part_votes_liste_gagnante">Part des votes de la liste gagnante</option>
+      <option value="aleatoire">Aléatoire</option></select>
+  </div>
+</div>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<div id="tours" class="form-group shiny-input-checkboxgroup shiny-input-container" role="group" aria-labelledby="tours-label">
+  <label class="control-label" id="tours-label" for="tours">Tours</label>
+  <div class="shiny-options-group">
+    <div class="checkbox">
+      <label><input type="checkbox" name="tours" value="1" checked="checked"> <span>1</span></label>
+    </div>
+    <div class="checkbox">
+      <label><input type="checkbox" name="tours" value="2" checked="checked"> <span>2</span></label>
+    </div>
+  </div>
+</div>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<div id="strategie" class="form-group shiny-input-radiogroup shiny-input-container shiny-input-container-inline" role="radiogroup" aria-labelledby="strategie-label">
+  <label class="control-label" id="strategie-label" for="strategie">Stratégie</label>
+  <div class="shiny-options-group">
+    <label class="radio-inline">
+      <input type="radio" name="strategie" value="offensive" checked="checked"> <span>Offensive</span>
+    </label>
+    <label class="radio-inline">
+      <input type="radio" name="strategie" value="defensive"> <span>Défensive</span>
+    </label>
+  </div>
+</div>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="2">
+<button class="btn btn-default action-button" id="go" type="button">
+  <span class="action-label">Lancer l'opération</span>
+</button>
+</div>
 </div></aside>
 <button class="collapse-toggle" type="button" title="Toggle sidebar" aria-expanded="true" aria-controls="bslib-sidebar-1">
     <svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 16 16" class="bi bi-chevron-left collapse-icon" style="fill:currentColor;" aria-hidden="true" role="img">

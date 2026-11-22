@@ -18,6 +18,7 @@ import geopandas as gpd
 import matplotlib.pyplot as plt
 from shiny import reactive
 from shiny.express import input, render, ui
+from scipy.stats import truncnorm
 
 sys.path.append('../outils')
 import fonctions_nomenclature as fnom
@@ -33,32 +34,75 @@ with fs.open(f"{BUCKET}/departements_2025.parquet", mode="rb") as f:
 with fs.open(f"{BUCKET}/table_analyse_muni.csv", mode="rb") as f:
     df = pd.read_csv(f, sep=",")
 
+def calcul_codes(nb_bistrots_par_ville = 1, nb_bistrots_total = 1000, critere_tri="aleatoire", croissant=False, tour="tous", strategie="offensive"):
+    
+    #Il choisit s'il vise des villes qui ont eu un second tour, celles qui n'en n'ont pas eu, ou toutes
+    df_filtre = df[df["tour"].isin([int(t) for t in tour])]
+    #Il classe les villes avec au moins un bistrot selon son critère de tri 
 
-def calcul_codes(croissant=True):
-    nb_bistrots_par_ville = 1
-    nb_bistrots_total = 1000
-    nombre_villes = nb_bistrots_total // nb_bistrots_par_ville
+    if critere_tri!="aleatoire":
+        bistrots_ordonnes = (df_filtre.sample(frac=1)
+                                  .sort_values(critere_tri, ascending=croissant, kind="stable"))
+    else:
+        bistrots_ordonnes = df_filtre.sample(frac=1).reset_index(drop=True)
 
-    bistrots_visites = (df.sort_values("nb_etablissements", ascending=croissant)
-                          .head(nombre_villes)
-                          .copy())
 
-    bistrots_visites['part_des_etablissements_visites'] = nb_bistrots_par_ville / bistrots_visites['nb_etablissements']
-    bistrots_visites['voix_pour_attal'] = bistrots_visites['part_des_etablissements_visites'] * bistrots_visites['Abstentions']
-    bistrots_visites['voix_LG'] = bistrots_visites['part_votes_liste_gagnante'] * bistrots_visites['Exprimés']
+    cumul = bistrots_ordonnes["nb_etablissements"].cumsum()
+    #Il conserve autant de villes que possible selon son nombre de bistrots max par ville
+    bistrots_visites = bistrots_ordonnes[cumul.shift(fill_value=0) < nb_bistrots_total].copy()
+    
+    #S'il dépasse les 1000 bistrots il perd en efficacité
+    mu, sigma = 0.5, 0.2               # choisis ton écart-type
+    a, b = (0 - mu) / sigma, (1 - mu) / sigma   # bornes exprimées en écarts-types
+    xs = truncnorm.rvs(a, b, loc=mu, scale=sigma)
+    efficacite = 1-(max((nb_bistrots_total-1000)/nb_bistrots_total, 0)*xs)
+    #print(efficacite)
+
+    bistrots_visites['part_des_etablissements_visites'] = (nb_bistrots_par_ville / bistrots_visites['nb_etablissements']).clip(upper=1)
+    #print(bistrots_visites['part_des_etablissements_visites'].describe())
+
+    if strategie=="defensive":
+
+        bistrots_visites['voix_pour_attal'] = bistrots_visites['part_des_etablissements_visites'] * bistrots_visites['Abstentions'] * efficacite #Il convainc des abstentionnistes
+        #print(bistrots_visites['voix_pour_attal'].describe())
+        bistrots_visites['voix_LG'] = bistrots_visites['part_votes_liste_gagnante'] * bistrots_visites['Exprimés']
+        #print(bistrots_visites['voix_LG'].describe())
+    elif strategie=="offensive":
+        bistrots_visites['voix_pour_attal'] = bistrots_visites['part_des_etablissements_visites'] * bistrots_visites['part_votes_liste_gagnante'] * bistrots_visites['Exprimés'] * efficacite # Il vole des voix à la liste gagnante
+        #print(bistrots_visites['voix_pour_attal'].describe())
+        bistrots_visites['voix_LG'] = (bistrots_visites['part_votes_liste_gagnante'] * bistrots_visites['Exprimés'])-bistrots_visites['voix_pour_attal']
+        #print(bistrots_visites['voix_LG'].describe())
+
+
     bistrots_visites['victoire_attal'] = bistrots_visites['voix_pour_attal'] > bistrots_visites['voix_LG']
 
     codes_communes_gagnees = bistrots_visites.loc[bistrots_visites['victoire_attal'], 'CODGEO']
     decompte_communes = int(bistrots_visites['victoire_attal'].sum())
-    part_communes = decompte_communes / bistrots_visites.shape[0]
+    part_communes = decompte_communes / max(bistrots_visites.shape[0], 1)
 
-    return codes_communes_gagnees, decompte_communes, part_communes
+    return codes_communes_gagnees, decompte_communes, part_communes 
 ```
 
 ## {.sidebar}
 
 ```{python}
+ui.markdown("...")
+ui.input_slider("nb_bistrots_par_ville", "Nombre de bistrots par ville", min=1, max=10, value=1, step=1)
+ui.input_slider("nb_bistrots_total", "Nombre total de bistrots", min=100, max=10000, value=1000, step=100)
+ui.input_select("critere_tri", "Critère de tri",
+                choices={"nb_etablissements": "Nombre de bistrots",
+                         "Abstentions": "Abstentions",
+                         "POPULATION": "Population",
+                         "TAUX_PAUVRETE": "Taux de pauvreté",
+                         "Nombre candidats": "Nombre de candidats",
+                         "part_votes_liste_gagnante": "Part des votes de la liste gagnante",
+                         "aleatoire": "Aléatoire"}) 
 ui.input_switch("croissant", "Ordre croissant", value=True)
+ui.input_checkbox_group("tours", "Tours", choices=["1", "2"], selected=["1", "2"])
+ui.input_radio_buttons("strategie", "Stratégie",
+                       choices={"offensive": "Offensive", "defensive": "Défensive"},
+                       inline=True)
+ui.input_action_button("go", "Lancer l'opération")
 ```
 
 ## Column
@@ -66,7 +110,16 @@ ui.input_switch("croissant", "Ordre croissant", value=True)
 ```{python}
 @reactive.calc
 def resultats():
-    return calcul_codes(input.croissant())
+    input.go()                  
+    with reactive.isolate():       
+        return calcul_codes(
+            nb_bistrots_par_ville=input.nb_bistrots_par_ville(),
+            nb_bistrots_total=input.nb_bistrots_total(),
+            critere_tri=input.critere_tri(),
+            croissant=input.croissant(),
+            tour=input.tours(),
+            strategie=input.strategie(),
+        )
 
 @render.plot
 def carte():
@@ -76,7 +129,7 @@ def carte():
 
     fig, ax = plt.subplots(figsize=(9, 9))
     communes.plot(ax=ax, color="#e8e8e8", linewidth=0)
-    communes[selection].plot(ax=ax, color="#c0392b", linewidth=0)
+    communes[selection].plot(ax=ax, color="#de7e20", linewidth=0)
     departements.boundary.plot(ax=ax, color="white", linewidth=0.4)
     ax.set_axis_off()
     ax.set_title(f"Gabriel Attal a emporté {decompte} communes grâce à ses visites,\n"
