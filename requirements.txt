@@ -1,2 +1,6 @@
 cartiflette
 ipywidgets
+nbclient 
+nbformat 
+jupyter 
+pyyaml
