@@ -84,23 +84,38 @@ def calcul_codes(nb_bistrots_par_ville = 1, nb_bistrots_total = 1000, critere_tr
 
 
 def server(input: Inputs, output: Outputs, session: Session) -> None:
-    ui.markdown("...")
-    ui.input_slider("nb_bistrots_par_ville", "Nombre de bistrots par ville", min=1, max=10, value=1, step=1)
-    ui.input_slider("nb_bistrots_total", "Nombre total de bistrots", min=100, max=10000, value=1000, step=100)
-    ui.input_select("critere_tri", "Critère de tri",
-                    choices={"nb_etablissements": "Nombre de bistrots",
-                             "Abstentions": "Abstentions",
-                             "POPULATION": "Population",
-                             "TAUX_PAUVRETE": "Taux de pauvreté",
-                             "Nombre candidats": "Nombre de candidats",
-                             "part_votes_liste_gagnante": "Part des votes de la liste gagnante",
-                             "aleatoire": "Aléatoire"}) 
-    ui.input_switch("croissant", "Ordre croissant", value=True)
-    ui.input_checkbox_group("tours", "Tours", choices=["1", "2"], selected=["1", "2"])
-    ui.input_radio_buttons("strategie", "Stratégie",
-                           choices={"offensive": "Offensive", "defensive": "Défensive"},
-                           inline=True)
-    ui.input_action_button("go", "Lancer l'opération")
+    ui.div(
+        ui.input_action_button("go", "Lancer l'opération !"),
+        ui.markdown("# Élaboration de la stratégie de visite des bistrots"),
+        ui.markdown("## Nombre de bistrots visités"),
+        ui.markdown("Gabriel Attal visitera ce nombre de bistrots dans la ville ou, à défaut, la totalité des bistrots de la ville"),
+        ui.input_slider("nb_bistrots_par_ville", "Nombre de bistrots par ville", min=1, max=10, value=1, step=1),
+        ui.markdown("Gabriel Attal visitera ce nombre de bistrots au total"),
+        ui.input_slider("nb_bistrots_total", "Nombre total de bistrots", min=100, max=10000, value=1000, step=100),
+
+        ui.markdown("## Sélection des bistrots"),
+        ui.markdown("Les villes seront classées selon le critère suivant pour le choix des bistrots à visiter"),
+        ui.input_select("critere_tri", "Critère de tri",
+                        choices={"nb_etablissements": "Nombre de bistrots",
+                                "Abstentions": "Abstentions",
+                                "POPULATION": "Population",
+                                "TAUX_PAUVRETE": "Taux de pauvreté",
+                                "Nombre candidats": "Nombre de candidats",
+                                "part_votes_liste_gagnante": "Part des votes de la liste gagnante",
+                                "aleatoire": "Aléatoire"}) ,
+        ui.markdown("Le critère sélectionné ci-dessus est dans le sens croissant/décroissant"),
+        ui.input_switch("croissant", "Ordre croissant", value=True),
+
+
+        ui.markdown("## Autres options"),
+        ui.markdown("Filtre des villes selon le nombre de tours de l'élection"),
+        ui.input_checkbox_group("tours", "Tours", choices=["1", "2"], selected=["1", "2"]),
+        ui.markdown("S'il choisit une stratégie défensive, Gabriel Attal convainc des abstentionnistes de voter pour lui. S'il choisit une stratégie offensive, il convainc des électeurs de la liste arrivée en tête de voter pour lui"),
+        ui.input_radio_buttons("strategie", "Stratégie",
+                            choices={"offensive": "Offensive", "defensive": "Défensive"},
+                            inline=True)
+
+    )
 
     # ========================================================================
 
