@@ -1,0 +1,4 @@
+
+    export QUARTO_PYTHON=/opt/python/bin/python
+    quarto serve interactive.qmd --port 5000 --host 0.0.0.0
+    https://user-mathildedonnenfeld-797469-0.user.lab.sspcloud.fr/proxy/5000/

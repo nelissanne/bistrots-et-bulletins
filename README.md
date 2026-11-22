@@ -6,7 +6,6 @@ Projet Python de deuxième année de l'Ensae. L'objectif est de confronter au ni
 * Le kernel doit tourner sur Python 3.13.15
 * Le repo doit être cloné sur le datalab Onyxia pour accéder à Minio. En effet, le nombre de requête étant fortement limité sur le site mettant a disposition les sources, ces dernières ont été copiées sur un bucket Onyxia par souci d'efficacité. 
 
-
 ### Sources & données
 
 #### Bibliographie
@@ -16,6 +15,9 @@ Campagne "Mille bistrots" du candidat Attal : https://attalpresident.fr/actualit
 #### Résultats des élections municipales
 https://www.data.gouv.fr/datasets/elections-municipales-2026-resultats-du-premier-tour
 https://www.data.gouv.fr/datasets/elections-municipales-2026-resultats-du-second-tour
+
+### Analyse statistique
+https://eric.univ-lyon2.fr/ricco/tanagra/fichiers/fr_Tanagra_Python_Regression_Logistique.pdf
 
 #### Sirene & NAF
 https://www.data.gouv.fr/datasets/base-sirene-des-entreprises-et-de-leurs-etablissements-siren-siret
