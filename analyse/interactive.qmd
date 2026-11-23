@@ -90,16 +90,16 @@ def calcul_codes(nb_bistrots_par_ville = 1, nb_bistrots_total = 1000, critere_tr
 
 ```{python}
 ui.div(
-    ui.input_action_button("go", "Lancer l'opération !"),
+    ui.input_action_button("go", "Lancer l'opération ! 🍺 ", style="background-color: #de7e20; border-color: #de7e20; color: white; font-weight: bold;", width="100%"),
     ui.markdown("# Élaboration de la stratégie de visite des bistrots"),
     ui.markdown("## Nombre de bistrots visités"),
-    ui.markdown("Gabriel Attal visitera ce nombre de bistrots dans la ville ou, à défaut, la totalité des bistrots de la ville"),
+    ui.markdown("Gabriel Attal visitera ce nombre de bistrots dans la ville ou, à défaut, la totalité des bistrots de la ville."),
     ui.input_slider("nb_bistrots_par_ville", "Nombre de bistrots par ville", min=1, max=10, value=1, step=1),
-    ui.markdown("Gabriel Attal visitera ce nombre de bistrots au total"),
+    ui.markdown("Gabriel Attal visitera ce nombre de bistrots au total. Attention ! Au-delà de 1000 bistrots, son discours perd graduellement en efficacité, ce qui affecte son taux de conversion (il convainc de moins en moins d'électeurs)."),
     ui.input_slider("nb_bistrots_total", "Nombre total de bistrots", min=100, max=10000, value=1000, step=100),
 
     ui.markdown("## Sélection des bistrots"),
-    ui.markdown("Les villes seront classées selon le critère suivant pour le choix des bistrots à visiter"),
+    ui.markdown("Les villes seront classées selon le critère suivant pour le choix des bistrots à visiter."),
     ui.input_select("critere_tri", "Critère de tri",
                     choices={"aleatoire": "Aléatoire",
                             "nb_etablissements": "Nombre de bistrots",
@@ -108,7 +108,7 @@ ui.div(
                             "TAUX_PAUVRETE": "Taux de pauvreté",
                             "Nombre candidats": "Nombre de candidats",
                             "part_votes_liste_gagnante": "Part des votes de la liste gagnante"}) ,
-    ui.markdown("Le critère sélectionné ci-dessus est dans le sens croissant/décroissant (aucun effet si critère aléatoire)"),
+    ui.markdown("Le critère sélectionné ci-dessus est dans le sens croissant/décroissant (aucun effet si critère aléatoire)."),
     ui.input_switch("croissant", "Ordre croissant", value=True),
 
 
