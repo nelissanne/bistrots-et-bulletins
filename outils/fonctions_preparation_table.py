@@ -110,7 +110,7 @@ def crea_ind3(df_nuance):
     La fonction prend en entrée la table renvoyée par la fonction crea_ind1, de laquelle on drop la colonne ind1
     La fonction renvoie en sortie une table avec l'indicateur 3
     """
-    nuances_extd = ['LRN', 'LUXD', 'LEXD', 'LUDR']
+    nuances_extd = ['LRN', 'LUXD', 'LEXD', 'LUDR', 'LREC', 'LDSV']
 
     df_nuance["ind3"] = (
         df_nuance["Nuance_maj"].isin(nuances_extd).astype(int)

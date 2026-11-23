@@ -13,8 +13,10 @@ def classer_nuance(df_nuance):
     # Exceptions : écrasent les règles principales
     df_nuance.loc[df_nuance["Nuance"] == "LREG", "Couleur"] = "Régionaliste"
     df_nuance.loc[df_nuance["Nuance"] == "LDIV", "Couleur"] = "Autre"
-    df_nuance.loc[df_nuance["Nuance"].isin(["LHOR", "LUDI"]), "Couleur"] = "Centre"
+    df_nuance.loc[df_nuance["Nuance"].isin(["LHOR", "LUDI", "LMDM", "LREN"]), "Couleur"] = "Centre"
     df_nuance.loc[df_nuance["Nuance"].isin(["LSOC", "LFI", "LCOM"]), "Couleur"] = "Gauche"
+    df_nuance.loc[df_nuance["Nuance"].isin(["LRED", "LDSV"]), "Couleur"] = "Droite"
+
     
     # Sans étiquette (associée aux NaN dans la table)
     df_nuance.loc[df_nuance["Nuance"].isna(), "Couleur"] = "Sans étiquette"
