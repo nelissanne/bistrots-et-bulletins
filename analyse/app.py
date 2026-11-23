@@ -43,7 +43,7 @@ def calcul_codes(nb_bistrots_par_ville = 1, nb_bistrots_total = 1000, critere_tr
         bistrots_ordonnes = df_filtre.sample(frac=1).reset_index(drop=True)
 
 
-    cumul = bistrots_ordonnes["nb_etablissements"].cumsum()
+    cumul = bistrots_ordonnes["nb_etablissements"].clip(upper=nb_bistrots_par_ville).cumsum()
     #Il conserve autant de villes que possible selon son nombre de bistrots max par ville
     bistrots_visites = bistrots_ordonnes[cumul.shift(fill_value=0) < nb_bistrots_total].copy()
     
@@ -56,6 +56,8 @@ def calcul_codes(nb_bistrots_par_ville = 1, nb_bistrots_total = 1000, critere_tr
 
     bistrots_visites['part_des_etablissements_visites'] = (nb_bistrots_par_ville / bistrots_visites['nb_etablissements']).clip(upper=1)
     #print(bistrots_visites['part_des_etablissements_visites'].describe())
+    nb_visitees = bistrots_visites.shape[0]
+
 
     if strategie=="defensive":
 
@@ -76,7 +78,7 @@ def calcul_codes(nb_bistrots_par_ville = 1, nb_bistrots_total = 1000, critere_tr
     decompte_communes = int(bistrots_visites['victoire_attal'].sum())
     part_communes = decompte_communes / max(bistrots_visites.shape[0], 1)
 
-    return codes_communes_gagnees, decompte_communes, part_communes 
+    return codes_communes_gagnees, decompte_communes, part_communes, nb_visitees
 
 # ========================================================================
 
@@ -134,7 +136,7 @@ def server(input: Inputs, output: Outputs, session: Session) -> None:
 
     @render.plot
     def carte():
-        codes_gagnees, decompte, part = resultats()
+        codes_gagnees, decompte, part, nb_visitees = resultats()
         codes = [str(c).zfill(5) for c in codes_gagnees]
         selection = communes["INSEE_COG"].isin(codes)
 
@@ -143,8 +145,8 @@ def server(input: Inputs, output: Outputs, session: Session) -> None:
         communes[selection].plot(ax=ax, color="#de7e20", linewidth=0)
         departements.boundary.plot(ax=ax, color="white", linewidth=0.4)
         ax.set_axis_off()
-        ax.set_title(f"Gabriel Attal a emporté {decompte} communes grâce à ses visites,\n"
-                     f"soit {part:.1%} des communes visitées ! Bravo !")
+        ax.set_title(f"Gabriel Attal a emporté {decompte} communes sur {nb_visitees} visitées,\n"
+                 f"soit {part:.1%} ! Bravo !")
         return fig
 
     # ========================================================================
@@ -154,7 +156,7 @@ def server(input: Inputs, output: Outputs, session: Session) -> None:
     return None
 
 
-_static_assets = ["interactive_files","analyse/interactive_files/libs/quarto-html/tippy.css","analyse/interactive_files/libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css","analyse/interactive_files/libs/quarto-html/quarto-syntax-highlighting-dark-447e42e69aaa9833c0ba1b986f430b20.css","analyse/interactive_files/libs/bootstrap/bootstrap-icons.css","analyse/interactive_files/libs/bootstrap/bootstrap-63bcdebd4f4b6394d80fa5c29b45d90f.min.css","analyse/interactive_files/libs/bootstrap/bootstrap-dark-63bcdebd4f4b6394d80fa5c29b45d90f.min.css","analyse/interactive_files/libs/clipboard/clipboard.min.js","analyse/interactive_files/libs/quarto-html/quarto.js","analyse/interactive_files/libs/quarto-html/tabsets/tabsets.js","analyse/interactive_files/libs/quarto-html/scrollable-regions/scrollable-regions.js","analyse/interactive_files/libs/quarto-html/popper.min.js","analyse/interactive_files/libs/quarto-html/tippy.umd.min.js","analyse/interactive_files/libs/quarto-html/anchor.min.js","analyse/interactive_files/libs/bootstrap/bootstrap.min.js","analyse/interactive_files/libs/quarto-dashboard/quarto-dashboard.js","analyse/interactive_files/libs/quarto-dashboard/stickythead.js","analyse/interactive_files/libs/quarto-dashboard/web-components.js","analyse/interactive_files/libs/quarto-dashboard/components.js"]
+_static_assets = ["interactive_files","interactive_files/libs/quarto-html/tippy.css","interactive_files/libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css","interactive_files/libs/quarto-html/quarto-syntax-highlighting-dark-447e42e69aaa9833c0ba1b986f430b20.css","interactive_files/libs/bootstrap/bootstrap-icons.css","interactive_files/libs/bootstrap/bootstrap-63bcdebd4f4b6394d80fa5c29b45d90f.min.css","interactive_files/libs/bootstrap/bootstrap-dark-63bcdebd4f4b6394d80fa5c29b45d90f.min.css","interactive_files/libs/clipboard/clipboard.min.js","interactive_files/libs/quarto-html/quarto.js","interactive_files/libs/quarto-html/tabsets/tabsets.js","interactive_files/libs/quarto-html/scrollable-regions/scrollable-regions.js","interactive_files/libs/quarto-html/popper.min.js","interactive_files/libs/quarto-html/tippy.umd.min.js","interactive_files/libs/quarto-html/anchor.min.js","interactive_files/libs/bootstrap/bootstrap.min.js","interactive_files/libs/quarto-dashboard/quarto-dashboard.js","interactive_files/libs/quarto-dashboard/stickythead.js","interactive_files/libs/quarto-dashboard/web-components.js","interactive_files/libs/quarto-dashboard/components.js"]
 _static_assets = {"/" + sa: Path(__file__).parent / sa for sa in _static_assets}
 
 app = App(
