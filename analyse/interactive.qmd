@@ -99,14 +99,14 @@ ui.div(
     ui.markdown("## Sélection des bistrots"),
     ui.markdown("Les villes seront classées selon le critère suivant pour le choix des bistrots à visiter"),
     ui.input_select("critere_tri", "Critère de tri",
-                    choices={"nb_etablissements": "Nombre de bistrots",
+                    choices={"aleatoire": "Aléatoire",
+                            "nb_etablissements": "Nombre de bistrots",
                             "Abstentions": "Abstentions",
                             "POPULATION": "Population",
                             "TAUX_PAUVRETE": "Taux de pauvreté",
                             "Nombre candidats": "Nombre de candidats",
-                            "part_votes_liste_gagnante": "Part des votes de la liste gagnante",
-                            "aleatoire": "Aléatoire"}) ,
-    ui.markdown("Le critère sélectionné ci-dessus est dans le sens croissant/décroissant"),
+                            "part_votes_liste_gagnante": "Part des votes de la liste gagnante"}) ,
+    ui.markdown("Le critère sélectionné ci-dessus est dans le sens croissant/décroissant (aucun effet si critère aléatoire)"),
     ui.input_switch("croissant", "Ordre croissant", value=True),
 
 

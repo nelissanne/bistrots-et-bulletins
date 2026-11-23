@@ -96,14 +96,14 @@ def server(input: Inputs, output: Outputs, session: Session) -> None:
         ui.markdown("## Sélection des bistrots"),
         ui.markdown("Les villes seront classées selon le critère suivant pour le choix des bistrots à visiter"),
         ui.input_select("critere_tri", "Critère de tri",
-                        choices={"nb_etablissements": "Nombre de bistrots",
+                        choices={"aleatoire": "Aléatoire",
+                                "nb_etablissements": "Nombre de bistrots",
                                 "Abstentions": "Abstentions",
                                 "POPULATION": "Population",
                                 "TAUX_PAUVRETE": "Taux de pauvreté",
                                 "Nombre candidats": "Nombre de candidats",
-                                "part_votes_liste_gagnante": "Part des votes de la liste gagnante",
-                                "aleatoire": "Aléatoire"}) ,
-        ui.markdown("Le critère sélectionné ci-dessus est dans le sens croissant/décroissant"),
+                                "part_votes_liste_gagnante": "Part des votes de la liste gagnante"}) ,
+        ui.markdown("Le critère sélectionné ci-dessus est dans le sens croissant/décroissant (aucun effet si critère aléatoire)"),
         ui.input_switch("croissant", "Ordre croissant", value=True),
 
 
@@ -154,7 +154,7 @@ def server(input: Inputs, output: Outputs, session: Session) -> None:
     return None
 
 
-_static_assets = ["interactive_files","interactive_files/libs/quarto-html/tippy.css","interactive_files/libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css","interactive_files/libs/quarto-html/quarto-syntax-highlighting-dark-b626d73c4c936ccc3cb08be7d45d1df6.css","interactive_files/libs/bootstrap/bootstrap-icons.css","interactive_files/libs/bootstrap/bootstrap-a9dce2c9f20ef7fbaf1d4cf536d1ffac.min.css","interactive_files/libs/bootstrap/bootstrap-dark-a9dce2c9f20ef7fbaf1d4cf536d1ffac.min.css","interactive_files/libs/clipboard/clipboard.min.js","interactive_files/libs/quarto-html/quarto.js","interactive_files/libs/quarto-html/tabsets/tabsets.js","interactive_files/libs/quarto-html/popper.min.js","interactive_files/libs/quarto-html/tippy.umd.min.js","interactive_files/libs/quarto-html/anchor.min.js","interactive_files/libs/bootstrap/bootstrap.min.js","interactive_files/libs/quarto-dashboard/quarto-dashboard.js","interactive_files/libs/quarto-dashboard/stickythead.js","interactive_files/libs/quarto-dashboard/web-components.js","interactive_files/libs/quarto-dashboard/components.js"]
+_static_assets = ["interactive_files","analyse/interactive_files/libs/quarto-html/tippy.css","analyse/interactive_files/libs/quarto-html/quarto-syntax-highlighting-63b5708e65d6cd79cd7618c58d0c21e7.css","analyse/interactive_files/libs/quarto-html/quarto-syntax-highlighting-dark-447e42e69aaa9833c0ba1b986f430b20.css","analyse/interactive_files/libs/bootstrap/bootstrap-icons.css","analyse/interactive_files/libs/bootstrap/bootstrap-63bcdebd4f4b6394d80fa5c29b45d90f.min.css","analyse/interactive_files/libs/bootstrap/bootstrap-dark-63bcdebd4f4b6394d80fa5c29b45d90f.min.css","analyse/interactive_files/libs/clipboard/clipboard.min.js","analyse/interactive_files/libs/quarto-html/quarto.js","analyse/interactive_files/libs/quarto-html/tabsets/tabsets.js","analyse/interactive_files/libs/quarto-html/scrollable-regions/scrollable-regions.js","analyse/interactive_files/libs/quarto-html/popper.min.js","analyse/interactive_files/libs/quarto-html/tippy.umd.min.js","analyse/interactive_files/libs/quarto-html/anchor.min.js","analyse/interactive_files/libs/bootstrap/bootstrap.min.js","analyse/interactive_files/libs/quarto-dashboard/quarto-dashboard.js","analyse/interactive_files/libs/quarto-dashboard/stickythead.js","analyse/interactive_files/libs/quarto-dashboard/web-components.js","analyse/interactive_files/libs/quarto-dashboard/components.js"]
 _static_assets = {"/" + sa: Path(__file__).parent / sa for sa in _static_assets}
 
 app = App(
