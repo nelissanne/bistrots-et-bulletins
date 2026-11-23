@@ -32,8 +32,8 @@ with fs.open(f"{BUCKET}/table_analyse_muni.csv", mode="rb") as f:
 
 def calcul_codes(nb_bistrots_par_ville = 1, nb_bistrots_total = 1000, critere_tri="aleatoire", croissant=False, tour="tous", strategie="offensive"):
     
-    #Il choisit s'il vise des villes qui ont eu un second tour, celles qui n'en n'ont pas eu, ou toutes
-    df_filtre = df[df["tour"].isin([int(t) for t in tour])]
+    #Il choisit s'il vise des villes qui ont eu un second tour, celles qui n'en n'ont pas eu, ou toutes. Il exclut les villes sans aucun bistrot.
+    df_filtre = df[df["tour"].isin([int(t) for t in tour]) & (df["nb_etablissements"] > 0)]
     #Il classe les villes avec au moins un bistrot selon son critère de tri 
 
     if critere_tri!="aleatoire":
