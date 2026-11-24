@@ -1,3 +1,5 @@
+*.pkl
+
 # Interactive files Quarto
 analyse/interactive_files/*
 
