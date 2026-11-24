@@ -16,6 +16,7 @@ Le projet présenté articulera pleinement 2 des 4 dimensions attendues (la réc
 ## Pour reproduire ces résultats 
 * Le kernel doit tourner sur Python 3.13.15
 * Le repo doit être cloné sur le datalab Onyxia pour accéder à Minio. En effet, le nombre de requêtes étant fortement limité sur le site mettant à disposition les sources, ces dernières ont été copiées sur un bucket Onyxia par souci d'efficacité.
+* L'application peut être lancée en exécutant `bash launch_app.sh` depuis la racine du repo cloné sur Onyxia.
 
 ### Sources & données
 
