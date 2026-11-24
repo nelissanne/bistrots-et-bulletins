@@ -10,6 +10,14 @@ Sans pour autant avoir la prétention de rassembler tous les Français, il reste
 
 En premier lieu, nous préparerons les diverses sources mobilisées afin de réaliser cette étude. En deuxième lieu, l'analyse étant menée sur un sous-échantillon de villes, nous réaliserons une analyse descriptive comparative de celui-ci avec l'ensemble des villes françaises. En troisième lieu, nous étudierons l'effet de la présence de bistrots sur l'existence d'un vote de droite et d’extrême droite dans les communes, à partir d'outils économétriques. Enfin, nous proposerons une application interactive permettant à nos lecteurs avertis de simuler une stratégie de campagne pour Gabriel Attal, avec pour objectif de maximiser le nombre de communes remportées grâce à des visites de bistrots. 
 
+## Comment lire ce repo ? 
+
+* Le dossier `data_load_and_prep` contient les scripts de chargement, de préparation puis de filtrage des données, numérotés dans l'ordre dans lequel ils sont appliqués.
+* Le dossier `stats_desc` contient le notebook qui présente les statistiques descriptives réalisées sur le jeu de données analysé.
+* Le dossier `analyse` contient un premier notebook contenant les régressions logistiques et linéaires réalisées sur les données, un deuxième contenant des recherches préliminaires au développement de l'application, et l'application quarto `interactive.qmd`.
+* Le dossier `outils` contient les fonctions définies dans le cadre du traitement des données.
+
+
 ## Attendus en matière d’évaluation 
 Le projet présenté articulera pleinement 2 des 4 dimensions attendues (la récupération de données issues de plusieurs sources ; l’exploration de l’information présente dans celles-ci), tandis que les deux autres (la présentation des résultats et la modélisation) sont abordées de manière plus limitée. En effet, la présentation des résultats repose principalement sur quelques statistiques descriptives univariées, sous forme de tableaux et de graphiques simples. La partie modélisation s'appuie sur plusieurs régressions logistiques visant à déterminer si la densité de bistrots peut contribuer à expliquer le vote à droite, et ce, en utilisant plusieurs variables cibles. Toutefois, les résultats obtenus ne permettent pas de tirer de conclusion. Cette analyse aurait notamment pu être approfondie en intégrant d'autres variables susceptibles d'influencer le vote, telles que la superficie des communes, leur structure par âge ou leur taux de criminalité. Ces éléments n'ont cependant pas été intégrés dans le temps imaparti.  Néanmoins, le projet développe une cinquième dimension, celle de l'utilisation d'une application interactive permettant, en modulant certains paramètres, de visualiser des résultats fictifs d'une campagne hypothétique de Gabriel Attal. 
 
