@@ -91,6 +91,8 @@ def calcul_codes(nb_bistrots_par_ville = 1, nb_bistrots_total = 1000, critere_tr
 ```{python}
 ui.div(
     ui.input_action_button("go", "Lancer l'opération ! 🍺 ", style="background-color: #de7e20; border-color: #de7e20; color: white; font-weight: bold;", width="100%"),
+    ui.markdown("# Règles du jeu"),
+    ui.markdown("Gabriel Attal choisit un nombre de bistrots par ville à visiter n, ainsi qu'un nombre de bistrots total N. \n\nIl ordonne les villes selon un critère de son choix, de façon ascendante ou descendante, puis se rend dans les n bistrots de chacune de ces premières villes ou, à défaut, dans l'ensemble des bistrots de la ville, et ce jusqu'à avoir atteint son objectif N. \n\nDans une ville donnée, il convertit autant d'électeurs que la part que représente ce bistrot sur l'ensemble des bistrots de la ville. \nCes électeurs peuvent être des anciens abstentionnistes (stratégie défensive), ou bien des électeurs de la liste gagnante (stratégie offensive). \n\nGabriel Attal peut choisir de se rendre uniquement dans les villes dont il sait qu'elles n'auront qu'un seul tour, ou à l'inverse qu'elles en auront deux. \n\nAttention toutefois ! Son discours perd en efficacité avec le nombre de bistrots visités au delà de 1000, ce qui affecte négativement son taux de conversion. À vous maintenant d'élaborer votre stratégie !"),
     ui.markdown("# Élaboration de la stratégie de visite des bistrots"),
     ui.markdown("## Nombre de bistrots visités"),
     ui.markdown("Gabriel Attal visitera ce nombre de bistrots dans la ville ou, à défaut, la totalité des bistrots de la ville."),
